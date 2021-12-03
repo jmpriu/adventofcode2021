@@ -1,6 +1,6 @@
 const { readStringArrayFromFile } = require("../common");
 
-const INPUT = readStringArrayFromFile("./input.txt");
+const INPUT = readStringArrayFromFile("/day3/input.txt");
 
 console.log(INPUT);
 

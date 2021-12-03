@@ -1,6 +1,6 @@
 const { readNumberArrayFromFile } = require("../common");
 
-const INPUT = readNumberArrayFromFile("./example.txt");
+const INPUT = readNumberArrayFromFile("/day1/input.txt");
 
 const countIncrements = (numbers) => {
     let increments = 0;

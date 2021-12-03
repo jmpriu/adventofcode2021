@@ -1,9 +1,13 @@
 const fs = require('fs');
+const path = require("path");
 
 const WINDOWS_NEWLINE = '\r\n';
 const UNIX_NEWLINE = '\n';
 
-const readFile = (filename) => fs.readFileSync(filename, { encoding: "utf-8" });
+const readFile = (filename) => fs.readFileSync(
+    path.join(process.cwd(), filename),
+    { encoding: "utf-8" }
+);
 
 const splitStringWithNewLine = (text) => {
     if (text.indexOf(WINDOWS_NEWLINE >= 0)) {
