@@ -13,34 +13,43 @@ const processInstructions = (instructionsArray) => {
 
 const [polymer, rules] = processInstructions(rawInstructionsInput);
 
-const nextStep = (polymer) => {
-    let newPolymer = polymer;
-    let i = 0;
-    while (i < newPolymer.length - 1) {
-        let ruleApply = false;
-        for (let j = 0; !ruleApply && j < rules.length; j++) {
-            if (newPolymer[i] === rules[j][0][0] && newPolymer[i + 1] === rules[j][0][1]) {
-                ruleApply = true;
-                newPolymer = newPolymer.slice(0, i + 1) + rules[j][1].toLowerCase() + newPolymer.slice(i + 1);
-            }
+
+let pairs = {};
+let characters = {};
+for (let i = 0; i < polymer.length - 1; i++) {
+    const pair = polymer[i] + polymer[i + 1];
+    pairs[pair] = (pairs[pair] || 0) + 1;
+}
+for (let i = 0; i < polymer.length; i++) {
+    characters[polymer[i]] = (characters[polymer[i]] || 0) + 1;
+}
+
+const nextStep = (pairs, characters) => {
+    const newPairs = { ...pairs };
+    const newCharacters = { ...characters };
+    for (let i = 0; i < rules.length; i++) {
+        const [[a, b], produce] = rules[i];
+        if (pairs[a + b]) {
+            const pairA = a + produce;
+            const pairB = produce + b;
+            newPairs[pairA] = (newPairs[pairA] || 0) + pairs[a + b];
+            newPairs[pairB] = (newPairs[pairB] || 0) + pairs[a + b];
+            newPairs[a + b] =  newPairs[a + b] - pairs[a + b];
+            newCharacters[produce] = (newCharacters[produce] || 0) + pairs[a + b];
         }
-        i++;
     }
-    return newPolymer.toUpperCase();
+
+    return { pairs: newPairs, characters: newCharacters }
 }
 
-const STEPS = 10;
-let generation = polymer;
-console.log(`Template: ${generation}`)
+const STEPS = 40;
 for (let i = 0; i < STEPS; i++) {
-    console.log(i, generation.length);
-    generation = nextStep(generation);
+    const result = nextStep(pairs, characters);
+    pairs = result.pairs;
+    characters = result.characters;
 }
+console.log(pairs, characters);
 
-const atoms = [...new Set([...generation])];
+const counts = Object.values(characters);
 
-const countAtomInString = (atom, string) => (string.match(new RegExp(atom, "g")) || []).length;
-const total = atoms.map(a => countAtomInString(a, generation));
-console.log(atoms);
-console.log(total);
-console.log('Result', Math.max(...total) - Math.min(...total));
+console.log(Math.max(...counts) - Math.min(...counts));
